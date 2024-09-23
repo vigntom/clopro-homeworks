@@ -15,7 +15,7 @@ variable "cloud_id" {
 variable "folder_id" {
   type        = string
   nullable = false
-  sensitive = true
+  // sensitive = true
   description = "https://cloud.yandex.ru/docs/resource-manager/operations/folder/get-id"
 }
 
@@ -85,4 +85,17 @@ variable "protected_vm" {
   type = string
   default = "virtualka"
   description = "Private vpc vm name"
+}
+
+variable "sa_name" {
+  type = string
+  default = "backet-sa"
+  description = "Service account name"
+}
+
+variable "bucket_name" {
+  type = string
+  default = "aleksandr-2024.09.21"
+  description = "Bucket name"
+  
 }
