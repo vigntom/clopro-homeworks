@@ -27,7 +27,14 @@ variable "default_zone" {
 
 variable "image_id" {
   type = string
-  default = "fd80mrhj8fl2oe87o4e1"
+  # default = "fd80mrhj8fl2oe87o4e1"
+  default = "fd8moeaar19homgk3vsm"
+  description = "Yandex compute Image id"
+}
+
+variable "lemp_image_id" {
+  type = string
+  default = "fd8rgek7pvfhiu98fcia"
   description = "Yandex compute Image id"
 }
 
@@ -97,5 +104,10 @@ variable "bucket_name" {
   type = string
   default = "aleksandr-2024.09.21"
   description = "Bucket name"
-  
+}
+
+variable "ig-sa_name" {
+  type = string
+  default = "ig-sa"
+  description = "Ig Service account name"
 }
