@@ -111,3 +111,17 @@ variable "ig-sa_name" {
   default = "ig-sa"
   description = "Ig Service account name"
 }
+
+variable "deploy-user" {
+  description = "Login для пользователя"
+  type = string
+  nullable = false
+  sensitive = true
+}
+
+variable "deploy-user-key" {
+  description = "Публичный ключ для пользователя"
+  type = string
+  nullable = false
+  sensitive = true
+}

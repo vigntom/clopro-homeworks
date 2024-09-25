@@ -131,7 +131,7 @@ resource "yandex_iam_service_account" "ig-sa" {
 
 resource "yandex_resourcemanager_folder_iam_member" "ig-sa-admin" {
   folder_id = var.folder_id
-  role      = "editor"
+  role      = "admin"
   member    = "serviceAccount:${yandex_iam_service_account.ig-sa.id}"
 }
 
@@ -155,13 +155,23 @@ resource "yandex_compute_instance_group" "ig-lemp" {
       }
     }
 
+    scheduling_policy {
+      preemptible = true
+    }
+
     network_interface {
       network_id = yandex_vpc_network.clopro.id
       subnet_ids = [yandex_vpc_subnet.public.id]
+      nat       = true
     }
 
     metadata = {
-      ssh-keys = "ubuntu:${file("~/.ssh/id_ed25519.pub")}"
+      user-data = templatefile("templates/cloud-init.yaml", {
+        bucket = yandex_storage_bucket.public-clopro-bucket.bucket
+        object-key = yandex_storage_object.cat-pic.key
+        deploy-user = var.deploy-user
+        deploy-user-key = var.deploy-user-key
+      })
     }
   }
 
@@ -177,6 +187,7 @@ resource "yandex_compute_instance_group" "ig-lemp" {
 
   deploy_policy {
     max_expansion = 1
-    max_unavailable = 1
+    max_unavailable = 2
+    max_deleting = 2
   }
 }

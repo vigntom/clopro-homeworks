@@ -1,0 +1,50 @@
+#cloud-config
+
+# Disable root SSH login and password authentication for SSH
+ssh_pwauth: false
+disable_root: true
+
+# Set the timezone and locale to your preferred settings
+timezone: "Europe/Moscow"
+
+manage_resolv_conf: true
+resolv_conf:
+  nameservers:
+    - 77.88.8.8
+    - 77.88.8.1
+
+write_files:
+  - content: |
+      ru_RU.UTF-8 UTF-8
+    append: true
+    path: /etc/locale.gen
+  - content: |
+      <html lang="ru">
+      <head>
+        <meta charset="UTF-8">
+        <title>тестовая страница со ссылкой на котика</title>
+      </head>
+      <body>
+        <h1>Привет!</h1>
+        <img src="https://storage.yandexcloud.net/${bucket}/${object-key}" alt="Котик">
+        <p>Это тестовая страница с <a href="https://storage.yandexcloud.net/${bucket}/${object-key}">ссылкой на котика</a>.</p>
+      </body>
+      </html>
+    append: false
+    path: /var/www/html/index.html
+
+runcmd:
+  - locale-gen
+
+locale: ru_RU.UTF-8
+
+# Create a user with sudo privileges and no password prompt for sudo
+users:
+  - name: ${deploy-user}
+    groups: users,sudo
+    shell: /bin/bash
+    sudo: 'ALL=(ALL) NOPASSWD:ALL'
+    uid: 1005
+    ssh_authorized_keys:
+      - ${deploy-user-key}
+
