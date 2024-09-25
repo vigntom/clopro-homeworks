@@ -186,8 +186,42 @@ resource "yandex_compute_instance_group" "ig-lemp" {
   }
 
   deploy_policy {
-    max_expansion = 1
-    max_unavailable = 2
+    max_expansion = 2
+    max_unavailable = 2 
     max_deleting = 2
+    max_creating = 2
+  }
+
+  load_balancer {
+    target_group_name = "lemp-target-group"
+    target_group_description = "LEMP target group"
+  }
+}
+
+resource "yandex_lb_network_load_balancer" "lb" {
+  name = "clopro-lb"
+
+  listener {
+    name = "clopro-lb-listener"
+    port = 80
+    external_address_spec {
+      ip_version = "ipv4"
+    }
+  }
+
+  attached_target_group {
+    target_group_id = yandex_compute_instance_group.ig-lemp.load_balancer["0"].target_group_id
+
+    healthcheck {
+      name = "http"
+      interval = 10
+      timeout = 5
+      unhealthy_threshold = 2
+      healthy_threshold = 2
+      http_options {
+        port = 80
+        path = "/index.html"
+      }
+    }
   }
 }
