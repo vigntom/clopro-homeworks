@@ -1,64 +1,76 @@
-# Домашнее задание к занятию «Организация сети»
+# Домашнее задание к занятию «Вычислительные мощности. Балансировщики нагрузки»  
 
 ### Подготовка к выполнению задания
 
 1. Домашнее задание состоит из обязательной части, которую нужно выполнить на провайдере Yandex Cloud, и дополнительной части в AWS (выполняется по желанию). 
 2. Все домашние задания в блоке 15 связаны друг с другом и в конце представляют пример законченной инфраструктуры.  
 3. Все задания нужно выполнить с помощью Terraform. Результатом выполненного домашнего задания будет код в репозитории. 
-4. Перед началом работы настройте доступ к облачным ресурсам из Terraform, используя материалы прошлых лекций и домашнее задание по теме «Облачные провайдеры и синтаксис Terraform». Заранее выберите регион (в случае AWS) и зону.
+4. Перед началом работы настройте доступ к облачным ресурсам из Terraform, используя материалы прошлых лекций и домашних заданий.
 
 ---
-### Задание 1. Yandex Cloud 
+## Задание 1. Yandex Cloud 
 
 **Что нужно сделать**
 
-1. Создать пустую VPC. Выбрать зону.
-2. Публичная подсеть.
+1. Создать бакет Object Storage и разместить в нём файл с картинкой:
 
- - Создать в VPC subnet с названием public, сетью 192.168.10.0/24.
- - Создать в этой подсети NAT-инстанс, присвоив ему адрес 192.168.10.254. В качестве image_id использовать fd80mrhj8fl2oe87o4e1.
- - Создать в этой публичной подсети виртуалку с публичным IP, подключиться к ней и убедиться, что есть доступ к интернету.
-3. Приватная подсеть.
- - Создать в VPC subnet с названием private, сетью 192.168.20.0/24.
- - Создать route table. Добавить статический маршрут, направляющий весь исходящий трафик private сети в NAT-инстанс.
- - Создать в этой приватной подсети виртуалку с внутренним IP, подключиться к ней через виртуалку, созданную ранее, и убедиться, что есть доступ к интернету.
+ - Создать бакет в Object Storage с произвольным именем (например, _имя_студента_дата_).
+ - Положить в бакет файл с картинкой.
+ - Сделать файл доступным из интернета.
+ 
+2. Создать группу ВМ в public подсети фиксированного размера с шаблоном LAMP и веб-страницей, содержащей ссылку на картинку из бакета:
 
-Resource Terraform для Yandex Cloud:
+ - Создать Instance Group с тремя ВМ и шаблоном LAMP. Для LAMP рекомендуется использовать `image_id = fd827b91d99psvq5fjit`.
+ - Для создания стартовой веб-страницы рекомендуется использовать раздел `user_data` в [meta_data](https://cloud.yandex.ru/docs/compute/concepts/vm-metadata).
+ - Разместить в стартовой веб-странице шаблонной ВМ ссылку на картинку из бакета.
+ - Настроить проверку состояния ВМ.
+ 
+3. Подключить группу к сетевому балансировщику:
 
-- [VPC subnet](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_subnet).
-- [Route table](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/vpc_route_table).
-- [Compute Instance](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/compute_instance).
+ - Создать сетевой балансировщик.
+ - Проверить работоспособность, удалив одну или несколько ВМ.
+4. (дополнительно)* Создать Application Load Balancer с использованием Instance group и проверкой состояния.
+
+Полезные документы:
+
+- [Compute instance group](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/compute_instance_group).
+- [Network Load Balancer](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs/resources/lb_network_load_balancer).
+- [Группа ВМ с сетевым балансировщиком](https://cloud.yandex.ru/docs/compute/operations/instance-groups/create-with-balancer).
 
 ---
-### Задание 2. AWS* (задание со звёздочкой)
+## Задание 2*. AWS (задание со звёздочкой)
 
 Это необязательное задание. Его выполнение не влияет на получение зачёта по домашней работе.
 
 **Что нужно сделать**
 
-1. Создать пустую VPC с подсетью 10.10.0.0/16.
-2. Публичная подсеть.
+Используя конфигурации, выполненные в домашнем задании из предыдущего занятия, добавить к Production like сети Autoscaling group из трёх EC2-инстансов с  автоматической установкой веб-сервера в private домен.
 
- - Создать в VPC subnet с названием public, сетью 10.10.1.0/24.
- - Разрешить в этой subnet присвоение public IP по-умолчанию.
- - Создать Internet gateway.
- - Добавить в таблицу маршрутизации маршрут, направляющий весь исходящий трафик в Internet gateway.
- - Создать security group с разрешающими правилами на SSH и ICMP. Привязать эту security group на все, создаваемые в этом ДЗ, виртуалки.
- - Создать в этой подсети виртуалку и убедиться, что инстанс имеет публичный IP. Подключиться к ней, убедиться, что есть доступ к интернету.
- - Добавить NAT gateway в public subnet.
-3. Приватная подсеть.
- - Создать в VPC subnet с названием private, сетью 10.10.2.0/24.
- - Создать отдельную таблицу маршрутизации и привязать её к private подсети.
- - Добавить Route, направляющий весь исходящий трафик private сети в NAT.
- - Создать виртуалку в приватной сети.
- - Подключиться к ней по SSH по приватному IP через виртуалку, созданную ранее в публичной подсети, и убедиться, что с виртуалки есть выход в интернет.
+1. Создать бакет S3 и разместить в нём файл с картинкой:
+
+ - Создать бакет в S3 с произвольным именем (например, _имя_студента_дата_).
+ - Положить в бакет файл с картинкой.
+ - Сделать доступным из интернета.
+2. Сделать Launch configurations с использованием bootstrap-скрипта с созданием веб-страницы, на которой будет ссылка на картинку в S3. 
+3. Загрузить три ЕС2-инстанса и настроить LB с помощью Autoscaling Group.
 
 Resource Terraform:
 
-1. [VPC](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc).
-1. [Subnet](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/subnet).
-1. [Internet Gateway](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/internet_gateway).
+- [S3 bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket)
+- [Launch Template](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template).
+- [Autoscaling group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group).
+- [Launch configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_configuration).
 
+Пример bootstrap-скрипта:
+
+```
+#!/bin/bash
+yum install httpd -y
+service httpd start
+chkconfig httpd on
+cd /var/www/html
+echo "<html><h1>My cool web-server</h1></html>" > index.html
+```
 ### Правила приёма работы
 
 Домашняя работа оформляется в своём Git репозитории в файле README.md. Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
