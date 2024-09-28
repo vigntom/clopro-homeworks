@@ -143,6 +143,7 @@ resource "yandex_compute_instance_group" "ig-lemp" {
 
   instance_template {
     platform_id = var.vm_config.platform
+
     resources {
       cores         = var.vm_config.cpu
       memory        = var.vm_config.memory
@@ -171,6 +172,7 @@ resource "yandex_compute_instance_group" "ig-lemp" {
         object-key = yandex_storage_object.cat-pic.key
         deploy-user = var.deploy-user
         deploy-user-key = var.deploy-user-key
+        hostname = "instance-{instance.short_id}-{instance.index}"
       })
     }
   }
@@ -195,6 +197,24 @@ resource "yandex_compute_instance_group" "ig-lemp" {
   load_balancer {
     target_group_name = "lemp-target-group"
     target_group_description = "LEMP target group"
+  }
+  
+  health_check {
+    interval = 10
+    timeout = 5
+    unhealthy_threshold = 2
+    healthy_threshold = 2
+
+    http_options {
+      port = 80
+      path = "/index.html"
+    }
+  }
+
+  timeouts {
+    create = "10m"
+    update = "10m"
+    delete = "10m"
   }
 }
 

@@ -28,6 +28,7 @@ write_files:
         <h1>Привет!</h1>
         <img src="https://storage.yandexcloud.net/${bucket}/${object-key}" alt="Котик">
         <p>Это тестовая страница с <a href="https://storage.yandexcloud.net/${bucket}/${object-key}">ссылкой на котика</a>.</p>
+        <p>Host: ${hostname}</p>
       </body>
       </html>
     append: false
