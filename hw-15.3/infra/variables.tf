@@ -102,7 +102,7 @@ variable "sa_name" {
 
 variable "bucket_name" {
   type = string
-  default = "aleksandr-2024.09.21"
+  default = "clopro-bucket"
   description = "Bucket name"
 }
 
