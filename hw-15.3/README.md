@@ -15,6 +15,14 @@
  - создать статическую страницу в Object Storage и применить сертификат HTTPS;
  - в качестве результата предоставить скриншот на страницу с сертификатом в заголовке (замочек).
 
+ -----
+
+### Решение
+
+1. Сайт с использованием HTTPS: ![vigntom.fun](./images/site-with-cert.jpg)
+2. Настройки Бакета: ![bucket-settings](./images/backet-config.jpg)
+ -----
+
 Полезные документы:
 
 - [Настройка HTTPS статичного сайта](https://cloud.yandex.ru/docs/storage/operations/hosting/certificate).
